@@ -1,0 +1,85 @@
+name: Autograding Tests
+'on':
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Sorted values test
+      id: sorted-values-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Sorted values test
+        setup-command: ''
+        command: python median.py
+        input: '1,2,3,4,5'
+        expected-output: "^(.|\\n)*3\\.0\\s*\\n?$"
+        comparison-method: regex
+        timeout: 1
+        max-score: 1
+    - name: Five value test
+      id: five-value-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Five value test
+        setup-command: ''
+        command: python median.py
+        input: '8,789,2,9,391'
+        expected-output: "^(.|\\n)*9\\.0\\s*\\n?$"
+        comparison-method: regex
+        timeout: 1
+        max-score: 1
+    - name: Eight value test
+      id: eight-value-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Eight value test
+        setup-command: ''
+        command: python median.py
+        input: '6,7,9,4658,2365,1,1,1'
+        expected-output: "^(.|\\n)*6\\.5\\s*\\n?$"
+        comparison-method: regex
+        timeout: 1
+        max-score: 1
+    - name: Ten value test
+      id: ten-value-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Ten value test
+        setup-command: ''
+        command: python median.py
+        input: '2,2,2,9,9,9,9,2,2,2'
+        expected-output: "^(.|\\n)*2\\.0\\s*\\n?$"
+        comparison-method: regex
+        timeout: 1
+        max-score: 1
+    - name: Single value test
+      id: single-value-test
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Single value test
+        setup-command: ''
+        command: python median.py
+        input: '3'
+        expected-output: "^(.|\\n)*3\\.0\\s*\\n?$"
+        comparison-method: regex
+        timeout: 1
+        max-score: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        SORTED-VALUES-TEST_RESULTS: "${{steps.sorted-values-test.outputs.result}}"
+        FIVE-VALUE-TEST_RESULTS: "${{steps.five-value-test.outputs.result}}"
+        EIGHT-VALUE-TEST_RESULTS: "${{steps.eight-value-test.outputs.result}}"
+        TEN-VALUE-TEST_RESULTS: "${{steps.ten-value-test.outputs.result}}"
+        SINGLE-VALUE-TEST_RESULTS: "${{steps.single-value-test.outputs.result}}"
+      with:
+        runners: sorted-values-test,five-value-test,eight-value-test,ten-value-test,single-value-test
